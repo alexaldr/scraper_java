@@ -15,13 +15,12 @@ import java.util.Arrays;
 /**
  * @author Alex Almeida Andrade
  */
-public class Imdb_filme {
-
+public class Imdb_filmes_ator {
     // propriedades
-    public ArrayList<ArrayList<String>> filmes = new ArrayList<>();
-
+    public ArrayList<ArrayList<String>> atores = new ArrayList<>();
+    
     // construtor da classe
-    public Imdb_filme(String criterio) {
+    public Imdb_filmes_ator(String criterio) {
         String url = "https://www.imdb.com/find?q=#_._#&s=nm&ref_=fn_al_nm_mr".replace("#_._#", criterio);
 
         // Jsoup object
@@ -41,43 +40,14 @@ public class Imdb_filme {
                     // debug teste
                     System.out.println("" + nome + " - " + link + "");
                     // 
-                    filmes.add(new ArrayList<>(Arrays.asList(nome, link)));
+                    atores.add(new ArrayList<>(Arrays.asList(nome, link)));
                 }
 
             }
         } catch (IOException ex) {
             System.out.println("Error: " + ex);
         }
-        System.out.println((filmes).size() + " atores!");
-        System.out.println("" + filmes + "");
-    }
-
-    public static void main(String[] args) {
-
-        String url_ator = "https://www.imdb.com/find?q=#_._#&s=nm&ref_=fn_al_nm_mr";
-
-        String url = "https://www.imdb.com/name/nm0000115/";
-
-        final Document doc;
-        ArrayList<String> filmes = new ArrayList<>();
-
-        try {
-            //obtem a página
-            doc = Jsoup.connect(url).get();
-
-            //seleciona apenas a lista de filmes
-            for (Element row : doc.select("[id^='actor-'] a:first-child")) {
-                //obtém o link absoluto dos filmes (usa regex para excluir o final)
-                final String title = row.absUrl("href").replaceAll("\\?ref_=nm_flmg_act_[0-9]*", "");
-                System.out.println(title);
-                filmes.add(title);
-            }
-        } catch (IOException ex) {
-            System.out.println("Error: " + ex);
-//            Logger.getLogger(Scraper_java.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        System.out.println((filmes).size() + " filmes!");
-
+        System.out.println((atores).size() + " atores!");
+        System.out.println("" + atores + "");
     }
 }

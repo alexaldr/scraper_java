@@ -5,12 +5,25 @@
  */
 package forms;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import scraper.Imdb_ator;
-import scraper.Scraper;
+//import scraper.Scraper;
 
 /**
  *
@@ -18,11 +31,15 @@ import scraper.Scraper;
  */
 public class Frm_pesquisa extends javax.swing.JFrame {
 
+    
+
     /**
      * Creates new form scraper_form
      */
     public Frm_pesquisa() {
         initComponents();
+        // curso no textfield
+        txt_criterio.requestFocusInWindow();
     }
 
     /**
@@ -50,6 +67,13 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         pnl_pesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisar por:"));
         pnl_pesquisa.setToolTipText("Search");
         pnl_pesquisa.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
+
+        txt_criterio.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        txt_criterio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_criterioKeyPressed(evt);
+            }
+        });
 
         btn_pesquisar.setText("Pesquisar");
         btn_pesquisar.addActionListener(new java.awt.event.ActionListener() {
@@ -116,21 +140,12 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 
         tbl_resultado.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
             }
-        });
+        ));
         tbl_resultado.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbl_resultadoMouseClicked(evt);
@@ -168,9 +183,6 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             // Your selected code here.
             lbl_criterio.setText("Nome do filme:");
         }
-//        } else if (evt.getStateChange() == ItemEvent.DESELECTED) {
-//            // Your deselected code here.
-//        }
     }//GEN-LAST:event_rad_filmeItemStateChanged
 
     private void rad_atorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_rad_atorItemStateChanged
@@ -186,43 +198,93 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         if (txt_criterio.getText().compareTo("") != 0) {
             //Qual radiobutton está selecionado
             if (rad_ator.isSelected()) {
-                //o construtor fará a pesquisa
-                Imdb_ator scrap = new Imdb_ator(txt_criterio.getText());
-                
-                System.out.println(scrap.atores.get(0).get(0));
-                //ppopular o jtable
-                DefaultTableModel modelo = (DefaultTableModel)tbl_resultado.getModel();
-                scrap.atores.forEach((item) -> {
-                    modelo.addRow(item.toArray());
-                });
-                
 
-            } else if (rad_filme.isSelected()) {
-
+                Imdb_ator scrap;
+                scrap = busca_dados(txt_criterio.getText());
+                limpa_tabela(tbl_resultado);
+                nomeia_colunas_tabela(tbl_resultado, new Object[]{"FOTO", "ATOR", "LINK IMDB"});
+                preenche_tabela(tbl_resultado, scrap);
             }
+//            else if (rad_filme.isSelected()) {
+//            }
         } else {
             JOptionPane.showMessageDialog(null, "Digite algo para ser pesquisado!", "Atenção!", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btn_pesquisarActionPerformed
 
+    private Imdb_ator busca_dados(String criterio) {
+        //o construtor fará a pesquisa
+        Imdb_ator scrap = new Imdb_ator(criterio);
+        return scrap;
+    }
+
+    private void limpa_tabela(JTable tbl) {
+        //model jtable
+        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+        model.setColumnCount(0);
+        model.setRowCount(0);
+        // atualizar tabela
+        tbl.validate();
+    }
+
+    private void preenche_tabela(JTable tbl, Imdb_ator scrap) {
+        //model jtable
+        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+        //array objects
+//        Object[] todos =  new Object[3];
+        //put data in rows
+        int i = 0;
+        scrap.atores.forEach((item) -> {
+//            model.addRow(item.toArray());
+            try {
+                URL url = new URL(item.get(0));
+                BufferedImage image = ImageIO.read(url);
+                ImageIcon icon = new ImageIcon(image);
+//                todos.
+                model.addRow(new Object[]{icon, item.get(1), item.get(2)});
+            } catch (MalformedURLException ex) {
+//                Logger.getLogger(Frm_pesquisa.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Erro:" + ex);
+            } catch (IOException ex) {
+//                Logger.getLogger(Frm_pesquisa.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Erro:" + ex);
+            }
+        });
+        model.getColumnClass(0);
+        model.getColumnClass(1);
+        model.getColumnClass(2);
+        tbl.setModel(model);
+        tbl.validate();
+        System.out.println("ColumnModel: " + tbl.getColumnModel());
+    }
+
+    private void nomeia_colunas_tabela(JTable tbl, Object[] nomes) {
+        //model jtable
+        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+        model.setColumnIdentifiers(nomes);
+        // atualizar tabela
+        tbl.validate();
+    }
+
+
     private void tbl_resultadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_resultadoMouseClicked
 
-        // TODO add your handling code here:
-//        doubleClick_table();
         int row = tbl_resultado.getSelectedRow(); //.rowAtPoint(evt.getPoint());
         int col = tbl_resultado.getSelectedColumn(); //.columnAtPoint(evt.getPoint());
-        int clicks = evt.getClickCount();
-        if (clicks == 2) {
-            JOptionPane.showMessageDialog(null, "Clicou DUAS vezes!", "Atenção", JOptionPane.INFORMATION_MESSAGE);
-        }
-//        }else{
-//            JOptionPane.showMessageDialog(null, "Clicou "+clicks+" vezes!", "Atenção", JOptionPane.INFORMATION_MESSAGE);
-//        }
-//        if (row >= 0 && col >= 0) {
-//            JOptionPane.showMessageDialog(null, "Linha " + (row+1) + ", Coluna " + (col+1) + ".", "Atenção", JOptionPane.INFORMATION_MESSAGE);
-//        }
 
+        JOptionPane.showMessageDialog(null,
+                "\nFoto: " + tbl_resultado.getValueAt(row, 0)
+                + "\nAtor: " + tbl_resultado.getValueAt(row, 1)
+                + "\nLink: " + tbl_resultado.getValueAt(row, 2),
+                "Atenção", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_tbl_resultadoMouseClicked
+
+    private void txt_criterioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_criterioKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            btn_pesquisar.doClick();
+        }
+
+    }//GEN-LAST:event_txt_criterioKeyPressed
 
     /**
      * @param args the command line arguments
@@ -255,7 +317,8 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Frm_pesquisa().setVisible(true);
+                Frm_pesquisa frm = new Frm_pesquisa();
+                frm.setVisible(true);
             }
         });
     }
