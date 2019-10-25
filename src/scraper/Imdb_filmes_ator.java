@@ -42,7 +42,6 @@ public class Imdb_filmes_ator {
                     // 
                     atores.add(new ArrayList<>(Arrays.asList(nome, link)));
                 }
-
             }
         } catch (IOException ex) {
             System.out.println("Error: " + ex);

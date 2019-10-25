@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,9 +20,11 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import scraper.Imdb_ator;
 //import scraper.Scraper;
 
@@ -31,7 +34,7 @@ import scraper.Imdb_ator;
  */
 public class Frm_pesquisa extends javax.swing.JFrame {
 
-    
+    private int i = 0;
 
     /**
      * Creates new form scraper_form
@@ -55,16 +58,15 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         pnl_pesquisa = new javax.swing.JPanel();
         txt_criterio = new javax.swing.JTextField();
         btn_pesquisar = new javax.swing.JButton();
-        rad_ator = new javax.swing.JRadioButton();
-        rad_filme = new javax.swing.JRadioButton();
         lbl_criterio = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl_resultado = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
+        setResizable(false);
 
-        pnl_pesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisar por:"));
+        pnl_pesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisa IMDB"));
         pnl_pesquisa.setToolTipText("Search");
         pnl_pesquisa.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
 
@@ -82,23 +84,6 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             }
         });
 
-        btn_grp_criterio.add(rad_ator);
-        rad_ator.setSelected(true);
-        rad_ator.setText("Ator");
-        rad_ator.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                rad_atorItemStateChanged(evt);
-            }
-        });
-
-        btn_grp_criterio.add(rad_filme);
-        rad_filme.setText("Filme");
-        rad_filme.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                rad_filmeItemStateChanged(evt);
-            }
-        });
-
         lbl_criterio.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
         lbl_criterio.setText("Nome do ator:");
 
@@ -108,14 +93,9 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_pesquisaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(rad_filme)
-                    .addGroup(pnl_pesquisaLayout.createSequentialGroup()
-                        .addComponent(rad_ator)
-                        .addGap(44, 44, 44)
-                        .addComponent(lbl_criterio)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_criterio, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
+                .addComponent(lbl_criterio)
+                .addGap(18, 18, 18)
+                .addComponent(txt_criterio)
                 .addGap(18, 18, 18)
                 .addComponent(btn_pesquisar)
                 .addContainerGap())
@@ -123,18 +103,11 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         pnl_pesquisaLayout.setVerticalGroup(
             pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_pesquisaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnl_pesquisaLayout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addGroup(pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txt_criterio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btn_pesquisar)
-                            .addComponent(lbl_criterio)))
-                    .addGroup(pnl_pesquisaLayout.createSequentialGroup()
-                        .addComponent(rad_ator)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(rad_filme)))
+                .addGap(13, 13, 13)
+                .addGroup(pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_criterio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_pesquisar)
+                    .addComponent(lbl_criterio))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -146,6 +119,8 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 
             }
         ));
+        tbl_resultado.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        tbl_resultado.setRowHeight(50);
         tbl_resultado.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbl_resultadoMouseClicked(evt);
@@ -160,8 +135,8 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnl_pesquisa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
+                    .addComponent(pnl_pesquisa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -170,43 +145,21 @@ public class Frm_pesquisa extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(pnl_pesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void rad_filmeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_rad_filmeItemStateChanged
-        // TODO add your handling code here:
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            // Your selected code here.
-            lbl_criterio.setText("Nome do filme:");
-        }
-    }//GEN-LAST:event_rad_filmeItemStateChanged
-
-    private void rad_atorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_rad_atorItemStateChanged
-        // TODO add your handling code here:
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            // Your selected code here.
-            lbl_criterio.setText("Nome do ator:");
-        }
-    }//GEN-LAST:event_rad_atorItemStateChanged
-
     private void btn_pesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pesquisarActionPerformed
         // o textbox está vazio?
         if (txt_criterio.getText().compareTo("") != 0) {
-            //Qual radiobutton está selecionado
-            if (rad_ator.isSelected()) {
-
-                Imdb_ator scrap;
-                scrap = busca_dados(txt_criterio.getText());
-                limpa_tabela(tbl_resultado);
-                nomeia_colunas_tabela(tbl_resultado, new Object[]{"FOTO", "ATOR", "LINK IMDB"});
-                preenche_tabela(tbl_resultado, scrap);
-            }
-//            else if (rad_filme.isSelected()) {
-//            }
+            Imdb_ator scrap;
+            scrap = busca_dados(txt_criterio.getText());
+            limpa_tabela(tbl_resultado);
+//            nomeia_colunas_tabela(tbl_resultado, new Object[]{"FOTO", "ATOR", "LINK IMDB"});
+            preenche_tabela(tbl_resultado, scrap);
         } else {
             JOptionPane.showMessageDialog(null, "Digite algo para ser pesquisado!", "Atenção!", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -228,20 +181,20 @@ public class Frm_pesquisa extends javax.swing.JFrame {
     }
 
     private void preenche_tabela(JTable tbl, Imdb_ator scrap) {
-        //model jtable
-        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
-        //array objects
-//        Object[] todos =  new Object[3];
+        String[] columns = {"FOTO", "ATOR", "LINK IMDB"};
+        Object[][] rows = new Object[25][3];
+
         //put data in rows
-        int i = 0;
+        i = 0;
         scrap.atores.forEach((item) -> {
-//            model.addRow(item.toArray());
+//            int i = 0;
             try {
                 URL url = new URL(item.get(0));
                 BufferedImage image = ImageIO.read(url);
                 ImageIcon icon = new ImageIcon(image);
 //                todos.
-                model.addRow(new Object[]{icon, item.get(1), item.get(2)});
+                rows[i] = (new Object[]{icon, item.get(1), item.get(2)});
+                i++;
             } catch (MalformedURLException ex) {
 //                Logger.getLogger(Frm_pesquisa.class.getName()).log(Level.SEVERE, null, ex);
                 System.out.println("Erro:" + ex);
@@ -250,27 +203,60 @@ public class Frm_pesquisa extends javax.swing.JFrame {
                 System.out.println("Erro:" + ex);
             }
         });
-        model.getColumnClass(0);
-        model.getColumnClass(1);
-        model.getColumnClass(2);
+
+        DefaultTableModel model = new DefaultTableModel(rows, columns) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                //definir as classes das colunas
+                switch (column) {
+                    case 0:
+                        return ImageIcon.class;
+                    case 1:
+                        return Object.class;
+                    case 2:
+                        return Object.class;
+                    default:
+                        return Object.class;
+                }
+            }
+
+            //bloquear edição
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tbl.setModel(model);
-        tbl.validate();
-        System.out.println("ColumnModel: " + tbl.getColumnModel());
-    }
 
-    private void nomeia_colunas_tabela(JTable tbl, Object[] nomes) {
-        //model jtable
-        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
-        model.setColumnIdentifiers(nomes);
-        // atualizar tabela
+        tbl.getColumnModel().getColumn(0).setMaxWidth(40);
+        tbl.getColumnModel().getColumn(1).setWidth(100);
+//        tbl.getColumnModel().getColumn(2).setPreferredWidth(400);
+        tbl.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+
         tbl.validate();
     }
 
+//    private void nomeia_colunas_tabela(JTable tbl, Object[] nomes) {
+//        //model jtable
+//        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+//        model.setColumnIdentifiers(nomes);
+//        // atualizar tabela
+//        tbl.validate();
+//    }
 
     private void tbl_resultadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_resultadoMouseClicked
 
         int row = tbl_resultado.getSelectedRow(); //.rowAtPoint(evt.getPoint());
         int col = tbl_resultado.getSelectedColumn(); //.columnAtPoint(evt.getPoint());
+
+//        try {
+//            BufferedImage img = ImageIO.read(new File());
+//            ImageIcon icon = new ImageIcon(img);
+//            JLabel label = new JLabel(icon);
+//            JOptionPane.showMessageDialog(null, label);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         JOptionPane.showMessageDialog(null,
                 "\nFoto: " + tbl_resultado.getValueAt(row, 0)
@@ -329,8 +315,6 @@ public class Frm_pesquisa extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_criterio;
     private javax.swing.JPanel pnl_pesquisa;
-    private javax.swing.JRadioButton rad_ator;
-    private javax.swing.JRadioButton rad_filme;
     private javax.swing.JTable tbl_resultado;
     private javax.swing.JTextField txt_criterio;
     // End of variables declaration//GEN-END:variables
