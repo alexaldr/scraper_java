@@ -41,6 +41,7 @@ public class Frm_pesquisa extends javax.swing.JFrame {
      */
     public Frm_pesquisa() {
         initComponents();
+        setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
         // curso no textfield
         txt_criterio.requestFocusInWindow();
     }
@@ -249,6 +250,11 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         int row = tbl_resultado.getSelectedRow(); //.rowAtPoint(evt.getPoint());
         int col = tbl_resultado.getSelectedColumn(); //.columnAtPoint(evt.getPoint());
 
+        
+        Frm_detalhes frm_det = new Frm_detalhes(tbl_resultado.getValueAt(row, 2).toString());
+        frm_det.setLocationRelativeTo(null);
+        frm_det.setVisible(true);
+        
 //        try {
 //            BufferedImage img = ImageIO.read(new File());
 //            ImageIcon icon = new ImageIcon(img);
@@ -257,12 +263,12 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
-        JOptionPane.showMessageDialog(null,
-                "\nFoto: " + tbl_resultado.getValueAt(row, 0)
-                + "\nAtor: " + tbl_resultado.getValueAt(row, 1)
-                + "\nLink: " + tbl_resultado.getValueAt(row, 2),
-                "Atenção", JOptionPane.INFORMATION_MESSAGE);
+//
+//        JOptionPane.showMessageDialog(null,
+//                "\nFoto: " + tbl_resultado.getValueAt(row, 0)
+//                + "\nAtor: " + tbl_resultado.getValueAt(row, 1)
+//                + "\nLink: " + tbl_resultado.getValueAt(row, 2),
+//                "Atenção", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_tbl_resultadoMouseClicked
 
     private void txt_criterioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_criterioKeyPressed

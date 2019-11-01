@@ -11,17 +11,19 @@ import org.jsoup.nodes.Element;
 //import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.jsoup.select.Elements;
 
 /**
  * @author Alex Almeida Andrade
  */
 public class Imdb_filmes_ator {
     // propriedades
-    public ArrayList<ArrayList<String>> atores = new ArrayList<>();
-    
+    public ArrayList<ArrayList<String>> filmes = new ArrayList<>();
+    public String nome, descricao, nascimento, foto;
+
     // construtor da classe
     public Imdb_filmes_ator(String criterio) {
-        String url = "https://www.imdb.com/find?q=#_._#&s=nm&ref_=fn_al_nm_mr".replace("#_._#", criterio);
+        String url = criterio;
 
         // Jsoup object
         Document doc;
@@ -29,24 +31,37 @@ public class Imdb_filmes_ator {
         try {
             // get html
             doc = Jsoup.connect(url).get();
+
+            nome = doc.selectFirst("h1.header").text();
+            descricao = doc.selectFirst("div.infobar").text();
+            nascimento = doc.selectFirst("div#name-born-info").text();
+            foto = doc.selectFirst("img#name-poster").absUrl("src");
+
             // seleciona apenas a lista de filmes
-            for (Element row : doc.select("td.result_text a")) {
-                // filtra pelos atores
-                if (row.absUrl("href").contains("www.imdb.com/name/")) {
-                    // link absoluto dos filmes (regex exclui o final)
-                    final String link = row.absUrl("href").replaceAll("\\?ref_=fn_nm_nm_[0-9]*", "");
-                    // texto da tag <a>
-                    final String nome = row.text();
-                    // debug teste
-                    System.out.println("" + nome + " - " + link + "");
-                    // 
-                    atores.add(new ArrayList<>(Arrays.asList(nome, link)));
-                }
+            for (Element row : doc.select("div.filmo-row")) {
+
+                // nome dos filmes
+                final String filme = row.selectFirst("a").text();
+
+                // ano do filme
+                final String ano = row.selectFirst("span.year_column").text();
+
+                // personagem
+                final String personagem = row.ownText().replace("()", "").trim();
+
+                // link absoluto dos filmes (regex exclui o final)
+                final String linkfilme = row.selectFirst("a").absUrl("href").replaceAll("\\?ref_=nm_flmg_[A-Za-z0-9_]*", "");
+
+                // debug teste
+                // System.out.println("filme: " + filme + "\nano: " + ano + "\npersonagem: " + personagem + "\nlink: " + linkfilme + "\n\n");
+
+                // adiciona à lista
+                filmes.add(new ArrayList<>(Arrays.asList(filme, ano, personagem, linkfilme)));
             }
         } catch (IOException ex) {
             System.out.println("Error: " + ex);
         }
-        System.out.println((atores).size() + " atores!");
-        System.out.println("" + atores + "");
+        System.out.println((filmes).size() + " filmes!");
+        System.out.println("" + filmes + "");
     }
 }
