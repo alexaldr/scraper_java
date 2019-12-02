@@ -5,6 +5,7 @@
  */
 package main;
 
+import forms.Frm_main;
 import forms.Frm_pesquisa;
 import javax.swing.SwingUtilities;
 
@@ -18,10 +19,16 @@ public class Main {
 
         //chamada assíncrona para a janela principal por uma expressão lambda
         java.awt.EventQueue.invokeLater(() -> {
-            Frm_pesquisa frm_run = new Frm_pesquisa();
+            Frm_main frm_run = new Frm_main();
             frm_run.setLocationRelativeTo(null);
             frm_run.setVisible(true);
         });
+        
+//        java.awt.EventQueue.invokeLater(() -> {
+//            Frm_pesquisa frm_run = new Frm_pesquisa();
+//            frm_run.setLocationRelativeTo(null);
+//            frm_run.setVisible(true);
+//        });
         
         System.out.println("Main OK!");
     }

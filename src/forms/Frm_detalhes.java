@@ -5,13 +5,15 @@
  */
 package forms;
 
+import database.Mysql_database;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -24,21 +26,26 @@ import scraper.Imdb_filmes_ator;
 public class Frm_detalhes extends javax.swing.JFrame {
 
     public int i;
+    private Frm_pesquisa form;
+    private String image_url;;
 
     /**
      * Creates new form Frm_detalhes
      */
-    public Frm_detalhes(String imdb_link) {
+    public Frm_detalhes(String imdb_link, Frm_pesquisa frm) {
+
+        form = frm;
 
         initComponents();
         setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
         Imdb_filmes_ator scrap = new Imdb_filmes_ator(imdb_link);
+        image_url = scrap.foto;
         lbl_ator.setText(scrap.nome);
         lbl_descricao.setText(scrap.descricao);
         lbl_nascimento.setText(scrap.nascimento);
         lbl_imdb.setText(imdb_link);
 
-        System.out.println(scrap.foto);
+        //System.out.println(scrap.foto);
         try {
             URL url = new URL(scrap.foto);
             BufferedImage image = ImageIO.read(url);
@@ -48,9 +55,9 @@ public class Frm_detalhes extends javax.swing.JFrame {
             lbl_foto.setIcon(new javax.swing.ImageIcon(dimg));
 
         } catch (MalformedURLException ex) {
-            System.out.println("Erro:" + ex);
+            System.out.println("Erro (MalformedURLException):" + ex);
         } catch (IOException ex) {
-            System.out.println("Erro:" + ex);
+            System.out.println("Erro (IOException):" + ex);
         }
 
         limpa_tabela(tbl_resultado);
@@ -126,10 +133,16 @@ public class Frm_detalhes extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl_resultado = new javax.swing.JTable();
         lbl_descricao = new javax.swing.JLabel();
+        btn_salvar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
         setPreferredSize(new java.awt.Dimension(734, 505));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         lbl_ator.setFont(new java.awt.Font("Ubuntu", 1, 36)); // NOI18N
         lbl_ator.setText("ator_name");
@@ -162,6 +175,15 @@ public class Frm_detalhes extends javax.swing.JFrame {
         lbl_descricao.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
         lbl_descricao.setText("descricao");
 
+        btn_salvar.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
+        btn_salvar.setForeground(java.awt.Color.green);
+        btn_salvar.setText("Salvar Dados");
+        btn_salvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_salvarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -173,11 +195,16 @@ public class Frm_detalhes extends javax.swing.JFrame {
                         .addComponent(lbl_foto, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbl_ator)
-                            .addComponent(lbl_descricao)
-                            .addComponent(lbl_nascimento)
-                            .addComponent(lbl_imdb))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btn_salvar))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lbl_ator)
+                                    .addComponent(lbl_descricao)
+                                    .addComponent(lbl_nascimento)
+                                    .addComponent(lbl_imdb))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -194,7 +221,8 @@ public class Frm_detalhes extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(lbl_nascimento)
                         .addGap(18, 18, 18)
-                        .addComponent(lbl_imdb)))
+                        .addComponent(lbl_imdb))
+                    .addComponent(btn_salvar, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
                 .addContainerGap())
@@ -208,7 +236,58 @@ public class Frm_detalhes extends javax.swing.JFrame {
 
     }//GEN-LAST:event_tbl_resultadoMouseClicked
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // TODO add your handling code here:
+        form.setVisible(true);
+    }//GEN-LAST:event_formWindowClosed
+
+    private void btn_salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_salvarActionPerformed
+        // objeto da classe do banco de dados
+        Mysql_database db = new Mysql_database();
+        ArrayList<ArrayList<String>> query =  new ArrayList<ArrayList<String>>();
+
+        // Verificar se ator já existe no banco de dados
+        if (db.actor_exists(lbl_imdb.getText())) {
+            JOptionPane.showMessageDialog(null, "O ator(iz) " + lbl_ator.getText() + " já está cadastrado(a)!",
+                    "Erro ao salvar!", JOptionPane.ERROR_MESSAGE);
+            btn_salvar.setEnabled(false);
+        } else {
+            // cadastrar o ator
+            query.add(new ArrayList<>(Arrays.asList(lbl_ator.getText(), 
+                                                    image_url,
+                                                    lbl_descricao.getText(),
+                                                    lbl_nascimento.getText(),
+                                                    lbl_imdb.getText()
+            )));
+            db.insert_sql(query, "actors");
+            JOptionPane.showMessageDialog(null, "O ator(iz) " + lbl_ator.getText() + " Foi incluído com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            
+            // cadastrar lista de filmes
+            query.clear();
+            for (int i = 0; i < tbl_resultado.getRowCount(); i++) {
+                query.add(new ArrayList<>(Arrays.asList(tbl_resultado.getValueAt(i, 0).toString(),
+                                                        tbl_resultado.getValueAt(i, 1).toString(),
+                                                        tbl_resultado.getValueAt(i, 2).toString(),
+                                                        tbl_resultado.getValueAt(i, 3).toString()
+                )));
+            }
+            db.insert_sql(query, "movies");
+            JOptionPane.showMessageDialog(null, "Os filmes foram inseridos com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            
+            // relacionar ator com os filmes cadastrados
+            query.clear();
+            for (int i = 0; i < tbl_resultado.getRowCount(); i++) {
+                query.add(new ArrayList<>(Arrays.asList(lbl_imdb.getText(),
+                                                        tbl_resultado.getValueAt(i, 3).toString()
+                )));
+            }
+            db.insert_sql(query, "actor_movie");
+            JOptionPane.showMessageDialog(null, "Os filmes foram associados ao ator(iz) com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btn_salvarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_salvar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_ator;
     private javax.swing.JLabel lbl_descricao;

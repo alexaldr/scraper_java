@@ -52,7 +52,7 @@ public class Imdb_ator {
 //                System.out.println(name.text());
                 }
                 for (Element link : links) {
-                    link_list.add(link.absUrl("href").replaceAll("\\?ref_=fn_nm_nm_[0-9]*", ""));
+                    link_list.add(link.absUrl("href").replaceAll("\\?ref_=[0-9a-zA-Z_]*", ""));
 //                System.out.println(link.absUrl("href").replaceAll("\\?ref_=fn_nm_nm_[0-9]*", ""));
                 }
                 // iterador para percorrer multiplos collections ao mesmo tempo
@@ -66,7 +66,7 @@ public class Imdb_ator {
                         atores.add(new ArrayList<>(Arrays.asList(img_iter.next(), name_iter.next(), link_iter.next())));
                     }
                 }
-                System.out.println("link:\t" + atores.get(0).get(0) + "\nSize: " + atores.size());
+                //System.out.println("link:\t" + atores.get(0).get(0) + "\nSize: " + atores.size());
             }
             // exception    
         } catch (IOException ex) {

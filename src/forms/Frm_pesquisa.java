@@ -5,6 +5,7 @@
  */
 package forms;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
@@ -35,11 +36,14 @@ import scraper.Imdb_ator;
 public class Frm_pesquisa extends javax.swing.JFrame {
 
     private int i = 0;
+    private Frm_main form;
 
     /**
      * Creates new form scraper_form
      */
-    public Frm_pesquisa() {
+    public Frm_pesquisa(Frm_main frm) {
+        form = frm;
+        
         initComponents();
         setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
         // curso no textfield
@@ -63,9 +67,14 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl_resultado = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         pnl_pesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisa IMDB"));
         pnl_pesquisa.setToolTipText("Search");
@@ -153,8 +162,20 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void set_cursor(int opt) {
+        Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
+        Cursor normalCursor = new Cursor(Cursor.DEFAULT_CURSOR);
+
+        if (opt == 1) {
+            setCursor(waitCursor);
+        } else {
+            setCursor(normalCursor);
+        }
+    }
+
     private void btn_pesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pesquisarActionPerformed
-        // o textbox está vazio?
+        set_cursor(1);
+        
         if (txt_criterio.getText().compareTo("") != 0) {
             Imdb_ator scrap;
             scrap = busca_dados(txt_criterio.getText());
@@ -164,6 +185,7 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(null, "Digite algo para ser pesquisado!", "Atenção!", JOptionPane.INFORMATION_MESSAGE);
         }
+        set_cursor(0);
     }//GEN-LAST:event_btn_pesquisarActionPerformed
 
     private Imdb_ator busca_dados(String criterio) {
@@ -246,74 +268,69 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 //    }
 
     private void tbl_resultadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_resultadoMouseClicked
-
+        set_cursor(1);
+        
         int row = tbl_resultado.getSelectedRow(); //.rowAtPoint(evt.getPoint());
         int col = tbl_resultado.getSelectedColumn(); //.columnAtPoint(evt.getPoint());
 
-        
-        Frm_detalhes frm_det = new Frm_detalhes(tbl_resultado.getValueAt(row, 2).toString());
+        Frm_detalhes frm_det = new Frm_detalhes(tbl_resultado.getValueAt(row, 2).toString(), this);
         frm_det.setLocationRelativeTo(null);
         frm_det.setVisible(true);
-        
-//        try {
-//            BufferedImage img = ImageIO.read(new File());
-//            ImageIcon icon = new ImageIcon(img);
-//            JLabel label = new JLabel(icon);
-//            JOptionPane.showMessageDialog(null, label);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        JOptionPane.showMessageDialog(null,
-//                "\nFoto: " + tbl_resultado.getValueAt(row, 0)
-//                + "\nAtor: " + tbl_resultado.getValueAt(row, 1)
-//                + "\nLink: " + tbl_resultado.getValueAt(row, 2),
-//                "Atenção", JOptionPane.INFORMATION_MESSAGE);
+        set_cursor(0);
+        this.setVisible(false);
+
     }//GEN-LAST:event_tbl_resultadoMouseClicked
 
     private void txt_criterioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_criterioKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            set_cursor(1);
             btn_pesquisar.doClick();
+            set_cursor(0);
         }
 
     }//GEN-LAST:event_txt_criterioKeyPressed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // TODO add your handling code here:
+        form.setVisible(true);
+    }//GEN-LAST:event_formWindowClosed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                Frm_pesquisa frm = new Frm_pesquisa();
-                frm.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(Frm_pesquisa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                Frm_pesquisa firm = new Frm_pesquisa();
+//                firm.setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup btn_grp_criterio;

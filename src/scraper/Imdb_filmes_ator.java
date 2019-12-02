@@ -17,6 +17,7 @@ import org.jsoup.select.Elements;
  * @author Alex Almeida Andrade
  */
 public class Imdb_filmes_ator {
+
     // propriedades
     public ArrayList<ArrayList<String>> filmes = new ArrayList<>();
     public String nome, descricao, nascimento, foto;
@@ -33,9 +34,32 @@ public class Imdb_filmes_ator {
             doc = Jsoup.connect(url).get();
 
             nome = doc.selectFirst("h1.header").text();
-            descricao = doc.selectFirst("div.infobar").text();
-            nascimento = doc.selectFirst("div#name-born-info").text();
-            foto = doc.selectFirst("img#name-poster").absUrl("src");
+            //System.out.println("nome: " + nome);
+
+            Elements elementDescricao = doc.select("div.infobar");
+            if (!elementDescricao.isEmpty()) {
+                descricao = doc.selectFirst("div.infobar").text();
+                //System.out.println("descrição: " + descricao);
+            } else {
+                descricao = "Sem descrição.";
+            }
+
+            Elements elementNascimento = doc.select("div#name-born-info");
+            if (!elementNascimento.isEmpty()) {
+                nascimento = doc.selectFirst("div#name-born-info").text();
+                //System.out.println("nascimento: " + nascimento);
+            } else {
+                nascimento = "Sem data de nascimento.";
+            }
+
+            Elements elementFoto = doc.select("img#name-poster");
+            if (!elementFoto.isEmpty()) {
+                foto = doc.selectFirst("img#name-poster").absUrl("src");
+                //System.out.println("foto " + foto);
+            } else {
+                foto = doc.selectFirst("img.no-pic-image").absUrl("src");
+                //System.out.println("foto " + foto);
+            }
 
             // seleciona apenas a lista de filmes
             for (Element row : doc.select("div.filmo-row")) {
@@ -50,18 +74,20 @@ public class Imdb_filmes_ator {
                 final String personagem = row.ownText().replace("()", "").trim();
 
                 // link absoluto dos filmes (regex exclui o final)
-                final String linkfilme = row.selectFirst("a").absUrl("href").replaceAll("\\?ref_=nm_flmg_[A-Za-z0-9_]*", "");
+                final String linkfilme = row.selectFirst("a").absUrl("href").replaceAll("\\?ref_=[0-9a-zA-Z_]*", "");
 
                 // debug teste
-                // System.out.println("filme: " + filme + "\nano: " + ano + "\npersonagem: " + personagem + "\nlink: " + linkfilme + "\n\n");
+                //System.out.println("filme: " + filme + "\nano: " + ano + "\npersonagem: " + personagem + "\nlink: " + linkfilme + "\n\n");
 
                 // adiciona à lista
                 filmes.add(new ArrayList<>(Arrays.asList(filme, ano, personagem, linkfilme)));
             }
         } catch (IOException ex) {
             System.out.println("Error: " + ex);
+//        } finally {
+//            System.out.println("Finally (SOME ERROR)");
         }
-        System.out.println((filmes).size() + " filmes!");
-        System.out.println("" + filmes + "");
+        //System.out.println((filmes).size() + " filmes!");
+        //System.out.println("" + filmes + "");
     }
 }
