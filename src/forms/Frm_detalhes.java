@@ -248,7 +248,7 @@ public class Frm_detalhes extends javax.swing.JFrame {
 
         // Verificar se ator já existe no banco de dados
         if (db.actor_exists(lbl_imdb.getText())) {
-            JOptionPane.showMessageDialog(null, "O ator(iz) " + lbl_ator.getText() + " já está cadastrado(a)!",
+            JOptionPane.showMessageDialog(null, "O ator(atriz) " + lbl_ator.getText() + " já está cadastrado(a)!",
                     "Erro ao salvar!", JOptionPane.ERROR_MESSAGE);
             btn_salvar.setEnabled(false);
         } else {
@@ -259,9 +259,14 @@ public class Frm_detalhes extends javax.swing.JFrame {
                                                     lbl_nascimento.getText(),
                                                     lbl_imdb.getText()
             )));
-            db.insert_sql(query, "actors");
-            JOptionPane.showMessageDialog(null, "O ator(iz) " + lbl_ator.getText() + " Foi incluído com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
-            
+            if(db.insert_sql(query, "actors")){
+                JOptionPane.showMessageDialog(null, "O ator(atriz) " + lbl_ator.getText() + " Foi incluído com sucesso!",
+                                                "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(null, "ERRO: Não foi possível salvar o ator(atriz)!",
+                    "Erro ao salvar!", JOptionPane.ERROR_MESSAGE);
+            }
+                        
             // cadastrar lista de filmes
             query.clear();
             for (int i = 0; i < tbl_resultado.getRowCount(); i++) {
@@ -271,8 +276,13 @@ public class Frm_detalhes extends javax.swing.JFrame {
                                                         tbl_resultado.getValueAt(i, 3).toString()
                 )));
             }
-            db.insert_sql(query, "movies");
-            JOptionPane.showMessageDialog(null, "Os filmes foram inseridos com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            if(db.insert_sql(query, "movies")){
+                JOptionPane.showMessageDialog(null, "Os filmes foram inseridos com sucesso!",
+                                                "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(null, "ERRO: Não foi possível salvar os filmes!",
+                    "Erro ao salvar!", JOptionPane.ERROR_MESSAGE);
+            }
             
             // relacionar ator com os filmes cadastrados
             query.clear();
@@ -281,8 +291,15 @@ public class Frm_detalhes extends javax.swing.JFrame {
                                                         tbl_resultado.getValueAt(i, 3).toString()
                 )));
             }
-            db.insert_sql(query, "actor_movie");
-            JOptionPane.showMessageDialog(null, "Os filmes foram associados ao ator(iz) com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            if(db.insert_sql(query, "actor_movie")){
+                JOptionPane.showMessageDialog(null, "Os filmes foram associados ao ator(atriz) com sucesso!",
+                                                "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(null, "ERRO: Não foi possível associar os filmes ao ator(atriz)!",
+                    "Erro ao salvar!", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            btn_salvar.setEnabled(false);
         }
     }//GEN-LAST:event_btn_salvarActionPerformed
 

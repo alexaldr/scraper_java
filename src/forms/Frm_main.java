@@ -27,11 +27,11 @@ public class Frm_main extends javax.swing.JFrame {
     public Frm_main() {
         try {
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            
+
             initComponents();
-            
+
             getContentPane().setBackground(Color.darkGray);
-            
+
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Frm_main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -75,6 +75,11 @@ public class Frm_main extends javax.swing.JFrame {
 
         btn_gere_bd.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         btn_gere_bd.setText("Gerir Banco de Dados");
+        btn_gere_bd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_gere_bdActionPerformed(evt);
+            }
+        });
 
         btn_about.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         btn_about.setText("About");
@@ -86,6 +91,11 @@ public class Frm_main extends javax.swing.JFrame {
 
         btn_pesquisa_bd.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         btn_pesquisa_bd.setLabel("Listar Atores");
+        btn_pesquisa_bd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_pesquisa_bdActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 100)); // NOI18N
         jLabel1.setForeground(java.awt.SystemColor.info);
@@ -154,14 +164,27 @@ public class Frm_main extends javax.swing.JFrame {
                 "About IMDB Scraper", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btn_aboutActionPerformed
 
+    private void btn_pesquisa_bdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pesquisa_bdActionPerformed
+        Frm_lista frm_run = new Frm_lista(this);
+        frm_run.setLocationRelativeTo(null);
+        frm_run.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btn_pesquisa_bdActionPerformed
+
+    private void btn_gere_bdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_gere_bdActionPerformed
+        Frm_gerencia frm_run = new Frm_gerencia(this);
+        frm_run.setLocationRelativeTo(null);
+        frm_run.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btn_gere_bdActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-            
-        
-        /* Create and display the form */
+
+ /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new Frm_main().setVisible(true);
         });

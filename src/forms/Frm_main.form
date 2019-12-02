@@ -99,6 +99,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Gerir Banco de Dados"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_gere_bdActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btn_about">
       <Properties>
@@ -118,6 +121,9 @@
         </Property>
         <Property name="label" type="java.lang.String" value="Listar Atores"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_pesquisa_bdActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>

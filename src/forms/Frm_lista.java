@@ -5,15 +5,23 @@
  */
 package forms;
 
+import com.mysql.cj.protocol.Resultset;
+import database.Mysql_database;
 import java.awt.Cursor;
 //import java.awt.event.ActionEvent;
 //import java.awt.event.ItemEvent;
-import java.awt.event.KeyEvent;
+//import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 //import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 //import java.util.ArrayList;
 //import java.util.Arrays;
 //import java.util.logging.Level;
@@ -22,7 +30,7 @@ import javax.imageio.ImageIO;
 //import javax.swing.Icon;
 import javax.swing.ImageIcon;
 //import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+//import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 //import javax.swing.table.TableColumn;
@@ -33,7 +41,7 @@ import scraper.Imdb_ator;
  *
  * @author alex
  */
-public class Frm_pesquisa extends javax.swing.JFrame {
+public class Frm_lista extends javax.swing.JFrame {
 
     private int i = 0;
     private Frm_main form;
@@ -41,13 +49,10 @@ public class Frm_pesquisa extends javax.swing.JFrame {
     /**
      * Creates new form scraper_form
      */
-    public Frm_pesquisa(Frm_main frm) {
+    public Frm_lista(Frm_main frm) {
         form = frm;
-        
         initComponents();
         setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
-        // curso no textfield
-        txt_criterio.requestFocusInWindow();
     }
 
     /**
@@ -61,9 +66,9 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 
         btn_grp_criterio = new javax.swing.ButtonGroup();
         pnl_pesquisa = new javax.swing.JPanel();
-        txt_criterio = new javax.swing.JTextField();
-        btn_pesquisar = new javax.swing.JButton();
-        lbl_criterio = new javax.swing.JLabel();
+        btn_atores = new javax.swing.JButton();
+        btn_filmes = new javax.swing.JButton();
+        btn_qtd_filmes = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl_resultado = new javax.swing.JTable();
 
@@ -76,26 +81,34 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             }
         });
 
-        pnl_pesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisa IMDB"));
+        pnl_pesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisa Banco de Dados"));
         pnl_pesquisa.setToolTipText("Search");
         pnl_pesquisa.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
 
-        txt_criterio.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        txt_criterio.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_criterioKeyPressed(evt);
-            }
-        });
-
-        btn_pesquisar.setText("Pesquisar");
-        btn_pesquisar.addActionListener(new java.awt.event.ActionListener() {
+        btn_atores.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        btn_atores.setText("Atores");
+        btn_atores.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_pesquisarActionPerformed(evt);
+                btn_atoresActionPerformed(evt);
             }
         });
 
-        lbl_criterio.setFont(new java.awt.Font("Ubuntu", 0, 14)); // NOI18N
-        lbl_criterio.setText("Nome do ator:");
+        btn_filmes.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        btn_filmes.setText("Filmes");
+        btn_filmes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_filmesActionPerformed(evt);
+            }
+        });
+
+        btn_qtd_filmes.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        btn_qtd_filmes.setText("Quantidade de Filmes por Ator(Atriz)");
+        btn_qtd_filmes.setActionCommand("Quantidade de Filmes por Ator(Atriz)");
+        btn_qtd_filmes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_qtd_filmesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnl_pesquisaLayout = new javax.swing.GroupLayout(pnl_pesquisa);
         pnl_pesquisa.setLayout(pnl_pesquisaLayout);
@@ -103,21 +116,21 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_pesquisaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbl_criterio)
+                .addComponent(btn_atores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(txt_criterio)
+                .addComponent(btn_filmes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(btn_pesquisar)
+                .addComponent(btn_qtd_filmes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         pnl_pesquisaLayout.setVerticalGroup(
             pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_pesquisaLayout.createSequentialGroup()
-                .addGap(13, 13, 13)
+                .addContainerGap()
                 .addGroup(pnl_pesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_criterio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_pesquisar)
-                    .addComponent(lbl_criterio))
+                    .addComponent(btn_atores)
+                    .addComponent(btn_filmes)
+                    .addComponent(btn_qtd_filmes))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -131,11 +144,6 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         ));
         tbl_resultado.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         tbl_resultado.setRowHeight(50);
-        tbl_resultado.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tbl_resultadoMouseClicked(evt);
-            }
-        });
         jScrollPane1.setViewportView(tbl_resultado);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -145,7 +153,7 @@ public class Frm_pesquisa extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1033, Short.MAX_VALUE)
                     .addComponent(pnl_pesquisa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -165,33 +173,11 @@ public class Frm_pesquisa extends javax.swing.JFrame {
     private void set_cursor(int opt) {
         Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
         Cursor normalCursor = new Cursor(Cursor.DEFAULT_CURSOR);
-
         if (opt == 1) {
             setCursor(waitCursor);
         } else {
             setCursor(normalCursor);
         }
-    }
-
-    private void btn_pesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pesquisarActionPerformed
-        set_cursor(1);
-        
-        if (txt_criterio.getText().compareTo("") != 0) {
-            Imdb_ator scrap;
-            scrap = busca_dados(txt_criterio.getText());
-            limpa_tabela(tbl_resultado);
-//            nomeia_colunas_tabela(tbl_resultado, new Object[]{"FOTO", "ATOR", "LINK IMDB"});
-            preenche_tabela(tbl_resultado, scrap);
-        } else {
-            JOptionPane.showMessageDialog(null, "Digite algo para ser pesquisado!", "Atenção!", JOptionPane.INFORMATION_MESSAGE);
-        }
-        set_cursor(0);
-    }//GEN-LAST:event_btn_pesquisarActionPerformed
-
-    private Imdb_ator busca_dados(String criterio) {
-        //o construtor fará a pesquisa
-        Imdb_ator scrap = new Imdb_ator(criterio);
-        return scrap;
     }
 
     private void limpa_tabela(JTable tbl) {
@@ -203,65 +189,45 @@ public class Frm_pesquisa extends javax.swing.JFrame {
         tbl.validate();
     }
 
-    private void preenche_tabela(JTable tbl, Imdb_ator scrap) {
-        String[] columns = {"FOTO", "ATOR", "LINK IMDB"};
-        Object[][] rows;
-        int size = scrap.atores.size();
-        if(size>=25){
-            rows = new Object[25][3];
-        }else{
-            rows = new Object[size][3];
+    private void preenche_tabela(JTable tbl, ResultSet rs, String[] columns) {
+        // tamanho do objeto
+        int size = 0;
+        if (rs != null) {
+            try {
+                rs.last();
+                size = rs.getRow();
+                rs.beforeFirst();
+            } catch (SQLException ex) {
+                Logger.getLogger(Frm_lista.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
+
+        Object[][] rows = new Object[size][3];
+                
         //put data in rows
         i = 0;
-        scrap.atores.forEach((item) -> {
-//            int i = 0;
-            try {
-                URL url = new URL(item.get(0));
-                BufferedImage image = ImageIO.read(url);
-                ImageIcon icon = new ImageIcon(image);
-//                todos.
-                rows[i] = (new Object[]{icon, item.get(1), item.get(2)});
+        try {
+            while (rs.next()) {
+                rows[i] = (new Object[]{rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)});
                 i++;
-            } catch (MalformedURLException ex) {
-//                Logger.getLogger(Frm_pesquisa.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("Erro:" + ex);
-            } catch (IOException ex) {
-//                Logger.getLogger(Frm_pesquisa.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("Erro:" + ex);
             }
-        });
+        } catch (SQLException ex) {
+            Logger.getLogger(Frm_lista.class.getName()).log(Level.SEVERE, null, ex);
+        };
 
+        // impedir edição da tabela
         DefaultTableModel model = new DefaultTableModel(rows, columns) {
             @Override
-            public Class<?> getColumnClass(int column) {
-                //definir as classes das colunas
-                switch (column) {
-                    case 0:
-                        return ImageIcon.class;
-                    case 1:
-                        return Object.class;
-                    case 2:
-                        return Object.class;
-                    default:
-                        return Object.class;
-                }
-            }
-
-            //bloquear edição
-            @Override
             public boolean isCellEditable(int row, int column) {
+                //all cells false
                 return false;
             }
         };
         tbl.setModel(model);
-
-        tbl.getColumnModel().getColumn(0).setMaxWidth(40);
-        tbl.getColumnModel().getColumn(1).setWidth(100);
+//        tbl.getColumnModel().getColumn(0).setMaxWidth(40);
+//        tbl.getColumnModel().getColumn(1).setWidth(100);
 //        tbl.getColumnModel().getColumn(2).setPreferredWidth(400);
         tbl.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-
         tbl.validate();
     }
 
@@ -273,37 +239,40 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 //        tbl.validate();
 //    }
 
-    private void tbl_resultadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_resultadoMouseClicked
-        set_cursor(1);
-        
-        int row = tbl_resultado.getSelectedRow(); //.rowAtPoint(evt.getPoint());
-        int col = tbl_resultado.getSelectedColumn(); //.columnAtPoint(evt.getPoint());
-
-        Frm_detalhes frm_det = new Frm_detalhes(tbl_resultado.getValueAt(row, 2).toString(), this);
-        frm_det.setLocationRelativeTo(null);
-        frm_det.setVisible(true);
-        set_cursor(0);
-        this.setVisible(false);
-
-    }//GEN-LAST:event_tbl_resultadoMouseClicked
-
-    private void txt_criterioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_criterioKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            set_cursor(1);
-            btn_pesquisar.doClick();
-            set_cursor(0);
-        }
-
-    }//GEN-LAST:event_txt_criterioKeyPressed
-
+    /**/
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
         form.setVisible(true);
     }//GEN-LAST:event_formWindowClosed
 
-//    /**
-//     * @param args the command line arguments
-//     */
+    private void btn_qtd_filmesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_qtd_filmesActionPerformed
+        limpa_tabela(tbl_resultado);
+
+        Mysql_database db = new Mysql_database();
+        String query = "SELECT name, description, actor_id, COUNT(*) AS qtd_filmes FROM actors, actor_movie WHERE actors.imdb_uri = actor_movie.actor_id GROUP BY actor_id";
+        String[] columns = {"NOME", "DESCRIÇÃO", "IMDB", "QUANTIDADE DE FILMES"};
+        preenche_tabela(tbl_resultado, db.search_sql(query), columns);
+    }//GEN-LAST:event_btn_qtd_filmesActionPerformed
+
+    private void btn_atoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_atoresActionPerformed
+        limpa_tabela(tbl_resultado);
+
+        Mysql_database db = new Mysql_database();
+        String query = "SELECT name, description, born_info, imdb_uri FROM actors ORDER BY name";
+        String[] columns = {"NOME", "DESCRIÇÃO", "NASCIMENTO", "IMDB"};
+        preenche_tabela(tbl_resultado, db.search_sql(query), columns);
+    }//GEN-LAST:event_btn_atoresActionPerformed
+
+    private void btn_filmesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_filmesActionPerformed
+        limpa_tabela(tbl_resultado);
+
+        Mysql_database db = new Mysql_database();
+        String query = "SELECT * FROM movies ORDER BY name";
+        String[] columns = {"NOME", "ANO", "PERSONAGEM", "IMDB"};
+        preenche_tabela(tbl_resultado, db.search_sql(query), columns);
+    }//GEN-LAST:event_btn_filmesActionPerformed
+
+//    @param args the command line arguments
 //    public static void main(String args[]) {
 //        /* Set the Nimbus look and feel */
 //        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -332,19 +301,19 @@ public class Frm_pesquisa extends javax.swing.JFrame {
 //        /* Create and display the form */
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                Frm_pesquisa firm = new Frm_pesquisa();
-//                firm.setVisible(true);
+//                Frm_lista frm = new Frm_lista();
+//                frm.setVisible(true);
 //            }
 //        });
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_atores;
+    private javax.swing.JButton btn_filmes;
     private javax.swing.ButtonGroup btn_grp_criterio;
-    private javax.swing.JButton btn_pesquisar;
+    private javax.swing.JButton btn_qtd_filmes;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lbl_criterio;
     private javax.swing.JPanel pnl_pesquisa;
     private javax.swing.JTable tbl_resultado;
-    private javax.swing.JTextField txt_criterio;
     // End of variables declaration//GEN-END:variables
 }

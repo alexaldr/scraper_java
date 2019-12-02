@@ -48,7 +48,7 @@ public class Mysql_database {
         }
     }
 
-    private ResultSet search_sql(String query) {
+    public ResultSet search_sql(String query) {
         ResultSet rs = null;
         try {
             // create a mysql database connection
