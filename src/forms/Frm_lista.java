@@ -249,7 +249,8 @@ public class Frm_lista extends javax.swing.JFrame {
         limpa_tabela(tbl_resultado);
 
         Mysql_database db = new Mysql_database();
-        String query = "SELECT name, description, actor_id, COUNT(*) AS qtd_filmes FROM actors, actor_movie WHERE actors.imdb_uri = actor_movie.actor_id GROUP BY actor_id";
+        String query = "SELECT name, description, actor_id, COUNT(*) AS qtd_filmes FROM actors, actor_movie "
+                + "WHERE actors.imdb_uri = actor_movie.actor_id GROUP BY actor_id ORDER BY name";
         String[] columns = {"NOME", "DESCRIÇÃO", "IMDB", "QUANTIDADE DE FILMES"};
         preenche_tabela(tbl_resultado, db.search_sql(query), columns);
     }//GEN-LAST:event_btn_qtd_filmesActionPerformed

@@ -65,6 +65,21 @@ public class Mysql_database {
         return rs;
     }
 
+    public boolean update_sql(String query) {
+        try {
+            // create a mysql database connection
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/scrapper?user=root&password=124789");
+            Statement st = conn.createStatement();
+            st.executeUpdate(query);
+            //conn.close();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(Mysql_database.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERRO: delete_sql");
+            return false;
+        }
+    }
+
     public boolean insert_sql(ArrayList<ArrayList<String>> q, String table) {
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/scrapper?user=root&password=124789");

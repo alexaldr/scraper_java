@@ -9,6 +9,7 @@ import com.mysql.cj.protocol.Resultset;
 import database.Mysql_database;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.KeyEvent;
 //import java.awt.event.ActionEvent;
 //import java.awt.event.ItemEvent;
 //import java.awt.event.KeyEvent;
@@ -116,6 +117,11 @@ public class Frm_gerencia extends javax.swing.JFrame {
         lbl_filtro.setText("Filtro:");
 
         txt_filtro.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        txt_filtro.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_filtroKeyPressed(evt);
+            }
+        });
 
         btn_filtrar.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         btn_filtrar.setText("Filtrar");
@@ -310,32 +316,136 @@ public class Frm_gerencia extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Digite algo para filtar a pesquisa pelo nome!",
                     "Erro ao filtrar!", JOptionPane.ERROR_MESSAGE);
         } else {
+            String query = "";
             txt_filtro.setBackground(Color.yellow);
             txt_filtro.setForeground(Color.black);
+            limpa_tabela(tbl_resultado);
+            Mysql_database db = new Mysql_database();
+            switch (op) {
+                case 1:
+                    query = "SELECT name, description, born_info, imdb_uri FROM actors WHERE name LIKE \"%" + txt_filtro.getText() + "%\" ORDER BY name";
+                    preenche_tabela(tbl_resultado, db.search_sql(query), new String[]{"NOME", "DESCRIÇÃO", "NASCIMENTO", "IMDB"});
+                    break;
+                case 2:
+                    query = "SELECT * FROM movies WHERE name LIKE \"%" + txt_filtro.getText() + "%\" ORDER BY name";
+                    preenche_tabela(tbl_resultado, db.search_sql(query), new String[]{"NOME", "ANO", "PERSONAGEM", "IMDB"});
+                    break;
+            }
         }
-
-
     }//GEN-LAST:event_btn_filtrarActionPerformed
 
     private void tbl_resultadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_resultadoMouseClicked
 
-        // qual campo será alterado
-        String[] options = op == 1 ? new String[]{"Nome", "Descrição", "Nascimento", "CANCELAR"} : new String[]{"Nome", "Ano", "Personagem", "CANCELAR"};
-
-        int x = JOptionPane.showOptionDialog(null, "Returns the position of your choice on the array",
-                "Click a button", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-
         int row = tbl_resultado.getSelectedRow(); //.rowAtPoint(evt.getPoint());
         int col = tbl_resultado.getSelectedColumn(); //.columnAtPoint(evt.getPoint());
+        String id = tbl_resultado.getValueAt(row, 3).toString();
+        Mysql_database db = new Mysql_database();
 
-        String value = tbl_resultado.getValueAt(row, 3).toString();
+        String table = "", field = "", query = "";
 
-//        Frm_detalhes frm_det = new Frm_detalhes(tbl_resultado.getValueAt(row, 2).toString(), this);
-//        frm_det.setLocationRelativeTo(null);
-//        frm_det.setVisible(true);
-//        set_cursor(0);
-//        this.setVisible(false);
+        // qual tabela será alterada:    1- ator     2-filmes
+        String[] options = op == 1 ? new String[]{"Nome", "Descrição", "Nascimento", "CANCELAR"} : new String[]{"Nome", "Ano", "Personagem", "CANCELAR"};
+
+        //alterar ou excluir?
+        int operation = JOptionPane.showOptionDialog(null, "Operação",
+                "Escolha uma opção:",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                new String[]{"Alterar?", "Excluir?"},
+                new String[]{"Alterar?", "Excluir?"});
+        System.out.println("Operação:"+operation);
+        System.out.println("ID:"+id);
+        
+        if(operation==JOptionPane.CLOSED_OPTION){
+            return;
+        }
+
+        // exluir:
+        if (operation == 1) {
+            switch (op) {
+                case 1:
+                    query = "DELETE FROM actors WHERE imdb_uri=\"" + id + "\"";
+                    db.update_sql(query);
+                    query = "SELECT name, description, born_info, imdb_uri FROM actors ORDER BY name";
+                    preenche_tabela(tbl_resultado, db.search_sql(query), new String[]{"NOME", "DESCRIÇÃO", "NASCIMENTO", "IMDB"});
+                    break;
+                case 2:
+                    query = "DELETE FROM movies WHERE imdb_uri=\"" + id + "\"";
+                    db.update_sql(query);
+                    query = "SELECT * FROM movies ORDER BY name";
+                    preenche_tabela(tbl_resultado, db.search_sql(query), new String[]{"NOME", "ANO", "PERSONAGEM", "IMDB"});
+                    break;
+                default:
+                    break;
+            }
+            // alterar
+        } else {
+            // opção escolhida
+            int option = JOptionPane.showOptionDialog(null, "Escolha um campo para alterar:",
+                    "Escolha um campo para alterar",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null, options, options[0]);
+            if (op == 1) {
+                table = "actors";
+                switch (option) {
+                    case 0:
+                        field = "name";
+                        break;
+                    case 1:
+                        field = "description";
+                        break;
+                    case 2:
+                        field = "born_info";
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                table = "movies";
+                switch (option) {
+                    case 0:
+                        field = "name";
+                        break;
+                    case 1:
+                        field = "years";
+                        break;
+                    case 2:
+                        field = "characters";
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            String new_value = JOptionPane.showInputDialog(null,
+                    "Qual o novo valor do campo " + options[option] + "?",
+                    tbl_resultado.getValueAt(row, option).toString());
+
+            query = "UPDATE " + table + " SET " + field + " = \"" + new_value + "\" WHERE imdb_uri=\"" + id + "\"";
+            switch (op) {
+                case 1:
+                    db.update_sql(query);
+                    query = "SELECT name, description, born_info, imdb_uri FROM actors ORDER BY name";
+                    preenche_tabela(tbl_resultado, db.search_sql(query), new String[]{"NOME", "DESCRIÇÃO", "NASCIMENTO", "IMDB"});
+                    break;
+                case 2:
+                    db.update_sql(query);
+                    query = "SELECT * FROM movies ORDER BY name";
+                    preenche_tabela(tbl_resultado, db.search_sql(query), new String[]{"NOME", "ANO", "PERSONAGEM", "IMDB"});
+                    break;
+                default:
+                    break;
+            }
+        }
     }//GEN-LAST:event_tbl_resultadoMouseClicked
+
+    private void txt_filtroKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_filtroKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            btn_filtrar.doClick();
+        }        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_filtroKeyPressed
 
 //    @param args the command line arguments
 //    public static void main(String args[]) {
